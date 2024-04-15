@@ -11,7 +11,7 @@ COPY . .
 RUN GOARCH=amd64 GOOS=linux CGO_ENABLED=0 GO111MODULE=on go build -o /drone-gitea-message .
 
 # Start a new stage for a smaller final image:
-FROM --platform=linux/amd64 plugins/base:multiarch
+FROM plugins/base:multiarch
 
 # Copy the binary from the builder stage:
 COPY --from=builder /drone-gitea-message /bin/

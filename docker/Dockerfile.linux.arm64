@@ -1,9 +1,0 @@
-FROM plugins/base:multiarch
-
-LABEL maintainer="Jozott00 <official@johannes-zottele.at>" \
-    org.label-schema.name="Drone Gitea Message" \
-    org.label-schema.vendor="Jozott00" \
-    org.label-schema.schema-version="1.0"
-
-ADD release/linux/arm64/drone-gitea-message /bin/
-ENTRYPOINT ["/bin/drone-gitea-message"]
