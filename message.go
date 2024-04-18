@@ -12,7 +12,6 @@ type messageClient struct {
 	Owner            string
 	Repo             string
 	Index            int64
-	Title            string
 	Message          string
 	DeleteIdentifier string
 }

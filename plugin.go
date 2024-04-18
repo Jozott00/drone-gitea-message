@@ -26,7 +26,6 @@ type (
 		MessageText      string
 		MessageFile      string
 		BaseURl          string
-		Title            string
 		DeleteIdentifier string
 	}
 	Plugin struct {
@@ -97,7 +96,6 @@ func (p Plugin) Exec() error {
 		Owner:            p.Repo.Owner,
 		Repo:             p.Repo.Name,
 		Index:            p.Pr.Index,
-		Title:            p.Config.Title,
 		Message:          string(content),
 		DeleteIdentifier: p.Config.DeleteIdentifier,
 	}

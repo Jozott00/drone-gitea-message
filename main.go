@@ -40,12 +40,6 @@ func main() {
 			EnvVar: "PLUGIN_BASE_URL,GITEA_MESSAGE_BASE_URL",
 		},
 		cli.StringFlag{
-			Name:   "title",
-			Value:  "",
-			Usage:  "string for the title shown in the gitea pr comment",
-			EnvVar: "PLUGIN_TITLE,GITEA_MESSAGE_TITLE",
-		},
-		cli.StringFlag{
 			Name:  "delete-identifier",
 			Value: "",
 			Usage: "string that is used as identifier for deletion upon a new message. " +
@@ -105,7 +99,6 @@ func run(c *cli.Context) error {
 			MessageText:      c.String("message-text"),
 			MessageFile:      c.String("message-file"),
 			BaseURl:          c.String("base-url"),
-			Title:            c.String("title"),
 			DeleteIdentifier: c.String("delete-identifier"),
 		},
 	}
