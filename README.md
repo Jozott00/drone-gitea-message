@@ -1,4 +1,5 @@
-# drone-gitea-messenger
+# drone-gitea-message
+[![Docker Pulls](https://img.shields.io/docker/pulls/jozott/drone-gitea-message)](https://hub.docker.com/r/jozott/drone-gitea-message)
 
 Drone plugin to send message as comments to Gitea pull requests. 
 All releases are available on [Docker Hub](https://hub.docker.com/r/jozott/drone-gitea-message). 
