@@ -3,6 +3,7 @@ package main
 import (
 	"code.gitea.io/sdk/gitea"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,10 +22,12 @@ type (
 		Event string
 	}
 	Config struct {
-		APIKey      string
-		MessageFile string
-		BaseURl     string
-		Title       string
+		APIKey           string
+		MessageText      string
+		MessageFile      string
+		BaseURl          string
+		Title            string
+		DeleteIdentifier string
 	}
 	Plugin struct {
 		Repo   Repo
@@ -56,29 +59,59 @@ func (p Plugin) Exec() error {
 		return fmt.Errorf("pull request number is not set")
 	}
 
-	glob, err := filepath.Glob(p.Config.MessageFile)
-	if err != nil {
-		return fmt.Errorf("failed to glob %s. %s", p.Config.MessageFile, err)
+	var content []byte
+	if p.Config.MessageText == "" {
+		if p.Config.MessageFile == "" {
+			return fmt.Errorf("you must provide either a message text or a message file")
+		}
+
+		glob, err := filepath.Glob(p.Config.MessageFile)
+		if err != nil {
+			return fmt.Errorf("failed to glob %s. %s", p.Config.MessageFile, err)
+		}
+
+		content, err = os.ReadFile(glob[0])
+		if err != nil {
+			return fmt.Errorf("failed to read the file %s. %s", glob[0], err)
+		}
+
+	} else {
+		if p.Config.MessageFile != "" {
+			return fmt.Errorf("you must provide either a message text or a message file, not both")
+		}
+		content = []byte(p.Config.MessageText)
 	}
 
-	content, err := os.ReadFile(glob[0])
-	if err != nil {
-		return fmt.Errorf("failed to read the file %s. %s", glob[0], err)
-	}
+	logrus.WithFields(logrus.Fields{
+		"repo.baseurl": p.Config.BaseURl,
+		"repo.owner":   p.Repo.Owner,
+		"repo.name":    p.Repo.Name,
+		"pr.index":     p.Pr.Index,
+	}).Info("Start message commenting")
 
 	httpClient := &http.Client{}
 	client, err := gitea.NewClient(p.Config.BaseURl, gitea.SetToken(p.Config.APIKey), gitea.SetHTTPClient(httpClient))
 
 	mc := messageClient{
-		Client:  client,
-		Owner:   p.Repo.Owner,
-		Repo:    p.Repo.Name,
-		Index:   p.Pr.Index,
-		Title:   p.Config.Title,
-		Message: string(content),
+		Client:           client,
+		Owner:            p.Repo.Owner,
+		Repo:             p.Repo.Name,
+		Index:            p.Pr.Index,
+		Title:            p.Config.Title,
+		Message:          string(content),
+		DeleteIdentifier: p.Config.DeleteIdentifier,
 	}
 
+	_, err = mc.deletePreviousMessages()
+	if err != nil {
+		return fmt.Errorf("error deleting previous messages: %w", err)
+	}
+
+	logrus.Info("Sending message as PR comment...")
 	_, _, err = mc.sendMessage()
+	if err == nil {
+		logrus.Info("Done.")
+	}
 
 	return err
 }

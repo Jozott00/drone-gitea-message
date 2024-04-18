@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -25,9 +25,14 @@ func main() {
 			EnvVar: "PLUGIN_API_KEY,GITEA_MESSAGE_API_KEY,GITEA_TOKEN",
 		},
 		cli.StringSliceFlag{
+			Name:   "message-text",
+			Usage:  "text of message content. If this is set, message-file is going to be ignored.",
+			EnvVar: "PLUGIN_MESSAGE_TEXT,GITEA_MESSAGE_FILE",
+		},
+		cli.StringSliceFlag{
 			Name:   "message-file",
 			Usage:  "file with content for message",
-			EnvVar: "PLUGIN_FILE,GITEA_MESSAGE_FILE",
+			EnvVar: "PLUGIN_MESSAGE_FILE,GITEA_MESSAGE_FILE",
 		},
 		cli.StringFlag{
 			Name:   "base-url",
@@ -41,9 +46,11 @@ func main() {
 			EnvVar: "PLUGIN_TITLE,GITEA_MESSAGE_TITLE",
 		},
 		cli.StringFlag{
-			Name:   "repo.ns",
-			Usage:  "repository namespace",
-			EnvVar: "DRONE_REPO_NAMESPACE",
+			Name:  "delete-identifier",
+			Value: "",
+			Usage: "string that is used as identifier for deletion upon a new message. " +
+				"So every previous comment in the PR that has this identifier will be deleted before the message is sent",
+			EnvVar: "PLUGIN_DELETE_IDENTIFIER",
 		},
 		cli.StringFlag{
 			Name:   "repo.owner",
@@ -94,10 +101,12 @@ func run(c *cli.Context) error {
 			Event: c.String("build.event"),
 		},
 		Config: Config{
-			APIKey:      c.String("api-key"),
-			MessageFile: c.String("message-file"),
-			BaseURl:     c.String("base-url"),
-			Title:       c.String("title"),
+			APIKey:           c.String("api-key"),
+			MessageText:      c.String("message-text"),
+			MessageFile:      c.String("message-file"),
+			BaseURl:          c.String("base-url"),
+			Title:            c.String("title"),
+			DeleteIdentifier: c.String("delete-identifier"),
 		},
 	}
 
