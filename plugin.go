@@ -69,6 +69,10 @@ func (p Plugin) Exec() error {
 			return fmt.Errorf("failed to glob %s. %s", p.Config.MessageFile, err)
 		}
 
+		if len(glob) == 0 {
+			return fmt.Errorf("no file found matching %s", p.Config.MessageFile)
+		}
+
 		content, err = os.ReadFile(glob[0])
 		if err != nil {
 			return fmt.Errorf("failed to read the file %s. %s", glob[0], err)
