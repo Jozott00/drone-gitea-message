@@ -14,7 +14,7 @@ deleted before sending the message.
 ```yaml
 steps:
   - name: send text to pr
-    image: jozott/drone-gitea-message:v0.2.0
+    image: jozott/drone-gitea-message:latest
     settings:
       api_key:
         from_secret: gitea_token
@@ -26,7 +26,7 @@ steps:
 ```yaml
 steps:
   - name: send file content to pr
-    image: jozott/drone-gitea-message:v0.2.0
+    image: jozott/drone-gitea-message:latest
     settings:
       api_key:
         from_secret: gitea_token
@@ -41,7 +41,7 @@ older status updates obsolete.
 ```yaml
 steps:
   - name: send test report to pr
-    image: jozott/drone-gitea-message:v0.2.0
+    image: jozott/drone-gitea-message:latest
     settings:
       api_key:
         from_secret: gitea_token
